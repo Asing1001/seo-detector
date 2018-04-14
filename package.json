@@ -1,0 +1,26 @@
+{
+  "name": "seo-detector",
+  "version": "0.0.1",
+  "description": "Detector will help you detect SEO issue",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Asing1001/seo-detector.git"
+  },
+  "keywords": [
+    "seo",
+    "detector"
+  ],
+  "author": "Sing",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Asing1001/seo-detector/issues"
+  },
+  "homepage": "https://github.com/Asing1001/seo-detector#readme",
+  "devDependencies": {
+    "ava": "^0.25.0"
+  }
+}
