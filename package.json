@@ -4,7 +4,7 @@
   "description": "Detector will help you detect SEO issue",
   "main": "index.js",
   "scripts": {
-    "test": "ava"    
+    "test": "ava"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,12 @@
   },
   "homepage": "https://github.com/Asing1001/seo-detector#readme",
   "devDependencies": {
-    "ava": "^0.25.0"
+    "ava": "^0.25.0",
+    "mocha": "^5.1.0",
+    "sinon": "^4.5.0",
+    "mock-fs": "^4.4.2"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2"
   }
 }
