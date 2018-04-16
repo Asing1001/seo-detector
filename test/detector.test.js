@@ -1,118 +1,109 @@
 const path = require('path');
 const fs = require('fs');
-const { Detector } = require("../");
 const { test } = require('ava');
-const mock = require('mock-fs');
+const mockFs = require('mock-fs');
 const sinon = require('sinon');
-const stream = require('stream');
 const cheerio = require('cheerio');
-const { getStreamContent } = require('../lib/utility')
+const { Detector } = require("../");
+const { getFakeReadableStream } = require('./testUtil')
 
 let sandbox = sinon.sandbox.create();
-let $ = cheerio.load("");
 
-const inputFilePath = path.resolve(__dirname, "test.html");
-const outPutFilePath = path.resolve(__dirname, "result.html");
-const fileContent = fs.readFileSync(inputFilePath, 'utf8');
-
-test.beforeEach(async t => {
-    mock({
-        [inputFilePath]: fileContent,
-        [outPutFilePath]: ""
-    })
+test.beforeEach(t => {
     sandbox = sinon.sandbox.create();
 })
 
-test.afterEach(async t => {
+test.afterEach(t => {
     sandbox.restore();
 })
 
-test('constructor throw when missing args', async t => {
-    t.throws(() => new Detector({
-        rules: []
-    }))
-
-    t.throws(() => new Detector({
-        input: ""
-    }))
-
-    t.throws(() => new Detector({
-        input: "",
-        rules: []
-    }))
-
-    t.throws(() => new Detector({}))
+test('constructor throw error when missing input', t => {
+    const err = t.throws(() => new Detector({ rules: [{}] }), Error)
+    t.is(err.message, "No input found")
 });
 
-test('constructor input accept stream/filepath', t => {
-    t.notThrows(() => new Detector({
-        input: inputFilePath,
-        rules: [{}]
-    }))
+test('constructor throw error when missing rules', t => {
+    const err = t.throws(() => new Detector({ input: "path/to/file" }), Error)
+    t.is(err.message, "No rules found")
+});
 
-    t.notThrows(() => new Detector({
-        input: fs.createReadStream(inputFilePath),
-        rules: [{}]
-    }))
-})
-
-test('rule.validate should be called', async t => {
-    const rule = { validate: sandbox.spy() };
+test('writeConsole() should call logger with validate result', async t => {
+    const logger = { log: sandbox.stub(), warn: sandbox.stub() }
+    const validateResult = ["validate result"];
+    const rules = [{ validate: $ => validateResult }]
     const seoDetector = new Detector({
-        input: inputFilePath,
-        rules: [rule],
+        input: getFakeReadableStream(),
+        rules,
+        logger
     });
 
     await seoDetector.writeConsole()
-    t.true(rule.validate.called)
+    t.true(logger.log.calledWith(validateResult[0]))
 });
 
-test('rule.validate called args[0] is cheerioStatic', async t => {
-    const rules = [{ validate: sandbox.spy() }]
+test('should warn if rule.validate() return not array', async t => {
+    const rules = [{ validate: () => { } }]
+    const logger = { log: sandbox.stub(), warn: sandbox.stub() }
+    const html = "<html></html>";
     const seoDetector = new Detector({
-        input: inputFilePath,
+        input: getFakeReadableStream(html),
+        logger,
         rules,
     });
 
-    await seoDetector.writeConsole()
-    t.true(typeof rules[0].validate.getCall(0).args[0].parseHTML === 'function')
+    await seoDetector.writeConsole();
+    t.true(logger.warn.calledWith("rule.validate should return array"))
 });
 
-test('writeConsole log called with validate result', async t => {
-    const logSpy = { log: sandbox.spy() };
-    const validateResult = "validate result";
-    const rules = [{ validate: $ => validateResult }]
+test('rule.validate() called with cheerioStatic', async t => {
+    const rules = [{ validate: sandbox.spy() }];
+    const logger = { log: sandbox.stub(), warn: sandbox.stub() }
+    const html = "<html></html>";
     const seoDetector = new Detector({
-        input: inputFilePath,
-        rules,
-        logger: logSpy
-    });
-
-    await seoDetector.writeConsole()
-    t.true(logSpy.log.calledWith(validateResult))
-});
-
-test('getReadableStream match validateResult', async t => {
-    const validateResult = "validate result";
-    const rules = [{ validate: $ => validateResult }]
-    const seoDetector = new Detector({
-        input: inputFilePath,
+        input: getFakeReadableStream(html),
+        logger,
         rules,
     });
 
-    const rs = await seoDetector.getReadableStream()
-    // rs.pipe(process.stdout)
-    t.true(await getStreamContent(rs) === validateResult)
+    await seoDetector.writeConsole();
+    t.true(rules[0].validate.calledWithMatch(cheerio.load(html)))
 });
 
-test('writeFile content match validateResult', async t => {
-    const validateResult = "validate result";
+test('getReadableStream() on data should be error chunks', async t => {
+    const validateResult = ["err", "err1", "err2"];
     const rules = [{ validate: $ => validateResult }]
     const seoDetector = new Detector({
-        input: inputFilePath,
+        input: getFakeReadableStream(),
+        rules,
+    });
+
+    const readableStream = await seoDetector.getReadableStream()
+    // readableStream.pipe(process.stdout)
+    return new Promise(resolve => {
+        const data = [];
+        readableStream.on('data', chunk => data.push(chunk.toString()));
+        readableStream.on('end', () => {
+            t.deepEqual(data, validateResult)
+            resolve()
+        });
+    })
+});
+
+test('writeFile() result should be errors concat with \\n', async t => {
+    const outPutFilePath = 'path/to/output.txt'
+    mockFs({
+        [outPutFilePath]: ""
+    })
+
+    const validateResult = ["error", "error1"];
+    const validateResult1 = ["error", "error1"];
+    const rules = [{ validate: $ => validateResult }, { validate: $ => validateResult1 }]
+    const seoDetector = new Detector({
+        input: getFakeReadableStream(),
         rules,
     });
 
     await seoDetector.writeFile(outPutFilePath)
-    t.true(fs.readFileSync(outPutFilePath, 'utf8') === validateResult)
+    t.is(fs.readFileSync(outPutFilePath, 'utf8'), [...validateResult, ...validateResult1].join('\n'))
+    mockFs.restore()
 });
