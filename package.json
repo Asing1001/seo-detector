@@ -4,8 +4,8 @@
   "description": "Detector will help you detect SEO issue",
   "main": "index.js",
   "scripts": {
-    "test": "ava -v",
-    "test:w": "ava -v --watch"
+    "test": "ava ./test/*.test.js -v",
+    "test:w": "ava ./test/*.test.js -v --watch"
   },
   "repository": {
     "type": "git",
