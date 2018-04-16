@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { detector, builtInRule } = require("../");
+const { Detector } = require("../");
 const { test } = require('ava');
 const mock = require('mock-fs');
 const sinon = require('sinon');
@@ -28,29 +28,29 @@ test.afterEach(async t => {
 })
 
 test('constructor throw when missing args', async t => {
-    t.throws(() => new detector({
+    t.throws(() => new Detector({
         rules: []
     }))
 
-    t.throws(() => new detector({
+    t.throws(() => new Detector({
         input: ""
     }))
 
-    t.throws(() => new detector({
+    t.throws(() => new Detector({
         input: "",
         rules: []
     }))
 
-    t.throws(() => new detector({}))
+    t.throws(() => new Detector({}))
 });
 
 test('constructor input accept stream/filepath', t => {
-    t.notThrows(() => new detector({
+    t.notThrows(() => new Detector({
         input: inputFilePath,
         rules: [{}]
     }))
 
-    t.notThrows(() => new detector({
+    t.notThrows(() => new Detector({
         input: fs.createReadStream(inputFilePath),
         rules: [{}]
     }))
@@ -58,7 +58,7 @@ test('constructor input accept stream/filepath', t => {
 
 test('rule.validate should be called', async t => {
     const rule = { validate: sandbox.spy() };
-    const seoDetector = new detector({
+    const seoDetector = new Detector({
         input: inputFilePath,
         rules: [rule],
     });
@@ -69,7 +69,7 @@ test('rule.validate should be called', async t => {
 
 test('rule.validate called args[0] is cheerioStatic', async t => {
     const rules = [{ validate: sandbox.spy() }]
-    const seoDetector = new detector({
+    const seoDetector = new Detector({
         input: inputFilePath,
         rules,
     });
@@ -82,7 +82,7 @@ test('writeConsole log called with validate result', async t => {
     const logSpy = { log: sandbox.spy() };
     const validateResult = "validate result";
     const rules = [{ validate: $ => validateResult }]
-    const seoDetector = new detector({
+    const seoDetector = new Detector({
         input: inputFilePath,
         rules,
         logger: logSpy
@@ -95,7 +95,7 @@ test('writeConsole log called with validate result', async t => {
 test('getReadableStream match validateResult', async t => {
     const validateResult = "validate result";
     const rules = [{ validate: $ => validateResult }]
-    const seoDetector = new detector({
+    const seoDetector = new Detector({
         input: inputFilePath,
         rules,
     });
@@ -108,7 +108,7 @@ test('getReadableStream match validateResult', async t => {
 test('writeFile content match validateResult', async t => {
     const validateResult = "validate result";
     const rules = [{ validate: $ => validateResult }]
-    const seoDetector = new detector({
+    const seoDetector = new Detector({
         input: inputFilePath,
         rules,
     });
@@ -116,32 +116,3 @@ test('writeFile content match validateResult', async t => {
     await seoDetector.writeFile(outPutFilePath)
     t.true(fs.readFileSync(outPutFilePath, 'utf8') === validateResult)
 });
-
-test('Predefined rule : Detect if any `<img />` tag without alt attribute', async t => {
-    builtInRule.imgWithAlt.validate(
-        cheerio.load(
-            `<img src="foo" alt="alt" /> <img src="foo" />`))
-    t.true(builtInRule.imgWithAlt.validate(
-        cheerio.load(
-            `<img src="foo" alt="alt" /> <img src="foo" />`)) === `There are 1 <img> tag without alt attribute`)
-});
-
-// test('detector getWritable should return writable stream', async t => {
-//     // const rule = {
-//     //     validate: $ => $('strong').count() > 15,
-//     // }
-
-//     mock({
-//         'some-file.html': ''//new Buffer([8, 6, 7, 5, 3, 0, 9])
-//     });
-
-//     const seoDetector = new detector({
-//         input: inputFilePath,
-//         rules: [],
-//     });
-
-//     // await seoDetector.getWritable();
-//     // await seoDetector.writeConsole()
-//     // await seoDetector.writeFile()
-//     t.pass();
-// });
