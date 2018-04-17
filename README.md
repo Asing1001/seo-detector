@@ -1,5 +1,7 @@
 # SEO detector
 
+[![Coverage Status](https://coveralls.io/repos/github/Asing1001/seo-detector/badge.svg?branch=master)](https://coveralls.io/github/Asing1001/seo-detector?branch=master)
+
 A Node.js package to detect HTML SEO defects
 
 ## Install

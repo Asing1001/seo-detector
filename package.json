@@ -1,11 +1,12 @@
 {
   "name": "seo-detector",
   "version": "0.0.1",
-  "description": "Detector will help you detect SEO issue",
+  "description": "seo-detector help you detect SEO issue",
   "main": "index.js",
   "scripts": {
-    "test": "ava ./test/*.test.js -v",
+    "test": "nyc ava ./test/*.test.js -v",
     "test:w": "ava ./test/*.test.js -v --watch",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "example": "node ./example/seoDetect.js"
   },
   "repository": {
@@ -24,7 +25,9 @@
   "homepage": "https://github.com/Asing1001/seo-detector#readme",
   "devDependencies": {
     "ava": "^1.0.0-beta.4",
+    "coveralls": "^3.0.0",
     "mock-fs": "^4.4.2",
+    "nyc": "^11.6.0",
     "sinon": "^4.5.0"
   },
   "dependencies": {
