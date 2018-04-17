@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "ava ./test/*.test.js -v",
-    "test:w": "ava ./test/*.test.js -v --watch"
+    "test:w": "ava ./test/*.test.js -v --watch",
+    "example": "node ./example/seoDetect.js"
   },
   "repository": {
     "type": "git",
@@ -15,7 +16,7 @@
     "seo",
     "detector"
   ],
-  "author": "Sing",
+  "author": "sing@paddingleft.com",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Asing1001/seo-detector/issues"
@@ -28,5 +29,8 @@
   },
   "dependencies": {
     "cheerio": "0.22.0"
+  },
+  "engines": {
+    "node": ">=8.9.4"
   }
 }

@@ -1,49 +1,99 @@
-# seo-detector
+# SEO detector
+
+A Node.js package to detect HTML SEO defects
+
+## Install
+
+```bash
+npm install seo-detector
+```
+
+## Example
+
+```javascript
+const path = require('path');
+const { Detector } = require('seo-detector');
+
+const fooExistRule = {
+    validate: $ => {
+        const errors = [];
+        if (!$('foo').length) errors.push('This html does not contains <foo> tag!')
+        return errors;
+    }
+}
+const streamDetector = new Detector({
+    input: path.resolve(__dirname, 'example.html'),
+    rules: [ fooExistRule ]
+});
+
+streamDetector.writeConsole().then(() => process.exit())
+```
+
+It will out put following in console
+
+```bash
+custom rule error: <foo> not exist!
+```
 
 ## Pre-defined SEO rules
 
 1. Detect if any `<img />` tag without alt attribute
-
 1. Detect if any `<a />` tag without rel attribute
-
 1. In `<head>` tag
-
-    i. Detect if header doesn’t have `<title>` tag
-
-    ii. Detect if header doesn’t have `<meta name=“descriptions” ... />` tag
-
-    iii. Detect if header doesn’t have `<meta name=“keywords” ... />` tag
-
+    - Detect if header doesn’t have `<title>` tag
+    - Detect if header doesn’t have `<meta name=“descriptions” ... />` tag
+    - Detect if header doesn’t have `<meta name=“keywords” ... />` tag
 1. Detect if there’re more than 15 `<strong>` tag in HTML (15 is a value should be configurable by user)
-
 1. Detect if a HTML have more than one `<H1>` tag.
 
-## Development Requirement
+### Use Pre-defined rules
 
-1. This package should be production ready and a NPM module
+```javascript
+const { Detector, preDefinedRule: {
+    anchorShouldWithRel,
+    imgShouldWithAlt,
+    strongLimit,
+    head,
+    H1Limit1
+} } = require('seo-detector');
 
-1. User is free to chain any rules by themselves
+const detector = new Detector({
+    input:'path/to/file.html',
+    rules:[head, H1Limit1, imgShouldWithAlt, strongLimit(15)]
+})
 
-    I. For example, they can only use the rule 1 and 4 or only use rule 2. 
+detector.writeConsole().then(() => process.exit())
+```
 
-    II. The order of rules is doesn’t matter
+## API Reference
 
-1. User can define and use their own rules easily
+### Constructor - `new Detector({input, rules ,logger?})`
 
-1. The input can be:
+- input : string | stream
+- rules : Array<{validate: cheerioStatic => string[]}>
+- logger : console-like object
 
-    I. A HTML file (User is able to config the input path)
+### `.writeConsole()` : `Promise<void>`
 
-    II. Node Readable Stream
+Output result to console
 
-1. The output can be:
+### `.getReadableStream()` : `Promise<stream>`
 
-    I. A file (User is able to config the output destination)
+Return a readable stream
 
-    II. Node Writable Stream
+### `.writeFile(filePath:string)` : `Promise<void>`
 
-    III. Console
+Output result to specific filepath
 
-1. Your package should be flexible: 
+## Development
 
-    I. When we want to implement additional rules for `<meta>` tag, The code changes should be small. Ex: Checking `<meta name=“robots” />` existing or not?!
+```bash
+# Install dependencies
+yarn install
+
+# Test
+yarn test
+
+# See example
+yarn example
+```
