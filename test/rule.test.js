@@ -39,3 +39,51 @@ test('anchorShouldWithRel', async t => {
             <a></a>`))
     t.deepEqual(actual, [`There are 1 <a> tag without rel attribute`])
 });
+
+test('<head>: no <head> no error', async t => {
+    const actual = rule.preDefined.head.validate(
+        cheerio.load(
+            `<body></body>`))
+    t.deepEqual(actual, [])
+});
+
+test('<head>: has <title>, <meta name="descriptions"/>, <meta name="keywords"/> no error', async t => {
+    const actual = rule.preDefined.head.validate(
+        cheerio.load(
+            `<head>
+            <title></title>
+            <meta name="descriptions"/>
+            <meta name="keywords"/>
+            </head>`))
+    t.deepEqual(actual, [])
+});
+
+test('<head>: without <title> have an error', async t => {
+    const actual = rule.preDefined.head.validate(
+        cheerio.load(
+            `<head>
+            <meta name="descriptions"/>
+            <meta name="keywords"/>
+            </head>`))
+    t.deepEqual(actual, ["This html without <title> tag"])
+});
+
+test('<head>: without <meta name="descriptions"/> have an error', async t => {
+    const actual = rule.preDefined.head.validate(
+        cheerio.load(
+            `<head>
+            <title></title>
+            <meta name="keywords"/>
+            </head>`))
+    t.deepEqual(actual, [`This html without <meta name="descriptions"> tag`])
+});
+
+test('<head>: without <meta name="keywords"/> have an error', async t => {
+    const actual = rule.preDefined.head.validate(
+        cheerio.load(
+            `<head>
+            <title></title>
+            <meta name="descriptions">            
+            </head>`))
+    t.deepEqual(actual, [`This html without <meta name="keywords"> tag`])
+});
