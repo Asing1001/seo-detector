@@ -36,7 +36,7 @@ test('constructor throw error when rules empty', t => {
     t.is(err.message, "No rules found")
 });
 
-test('writeConsole() should call rule.validate($) with cheerioStatic', async t => {
+test('writeConsole() with Stream input should call rule.validate($) with cheerioStatic', async t => {
     const rules = [{ validate: sandbox.spy() }];
     const html = "<html></html>";
     const seoDetector = new Detector({
@@ -47,6 +47,18 @@ test('writeConsole() should call rule.validate($) with cheerioStatic', async t =
 
     await seoDetector.writeConsole();
     t.true(rules[0].validate.calledWithMatch(cheerio.load(html)))
+});
+
+test('writeConsole() with Filename input should call rule.validate($) with cheerioStatic', async t => {
+    const rules = [{ validate: sandbox.spy() }];
+    const seoDetector = new Detector({
+        input: __filename,
+        logger,
+        rules,
+    });
+
+    await seoDetector.writeConsole();
+    t.true(rules[0].validate.calledWithMatch(cheerio.load("")))
 });
 
 test('Call logger.warn() when any rule.validate() not return array', async t => {
