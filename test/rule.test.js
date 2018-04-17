@@ -1,16 +1,16 @@
 const cheerio = require('cheerio');
 const { test } = require('ava');
-const { rule } = require("../");
+const { preDefinedRule } = require("../");
 
 test('imgShouldWithAlt: no <img> no errors', t => {
-    const actual = rule.preDefined.imgShouldWithAlt.validate(
+    const actual = preDefinedRule.imgShouldWithAlt.validate(
         cheerio.load(
             `<h1></h1>`));
     t.deepEqual(actual, []);
 });
 
 test('imgShouldWithAlt: <img> with alt no errors', t => {
-    const actual = rule.preDefined.imgShouldWithAlt.validate(
+    const actual = preDefinedRule.imgShouldWithAlt.validate(
         cheerio.load(
             `<img src="foo" alt="alt" />
             <img src="foo" alt="bar"/>`));
@@ -18,14 +18,14 @@ test('imgShouldWithAlt: <img> with alt no errors', t => {
 });
 
 test('imgShouldWithAlt: <img> without alt return an error', t => {
-    const actual = rule.preDefined.imgShouldWithAlt.validate(
+    const actual = preDefinedRule.imgShouldWithAlt.validate(
         cheerio.load(
             `<img src="foo" />`));
     t.is(actual.length, 1);
 });
 
 test('imgShouldWithAlt: two <img> without alt return one error with count 2', t => {
-    const actual = rule.preDefined.imgShouldWithAlt.validate(
+    const actual = preDefinedRule.imgShouldWithAlt.validate(
         cheerio.load(
             `<img src="foo" />
             <img src="foo" />`));
@@ -33,14 +33,14 @@ test('imgShouldWithAlt: two <img> without alt return one error with count 2', t 
 });
 
 test('anchorShouldWithRel: no <a> no errors', t => {
-    const actual = rule.preDefined.anchorShouldWithRel.validate(
+    const actual = preDefinedRule.anchorShouldWithRel.validate(
         cheerio.load(
             `<body></body>`));
     t.deepEqual(actual, []);
 });
 
 test('anchorShouldWithRel: <a> with rel no errors', t => {
-    const actual = rule.preDefined.anchorShouldWithRel.validate(
+    const actual = preDefinedRule.anchorShouldWithRel.validate(
         cheerio.load(
             `<a src="foo" rel="rel" />
             <a src="foo" rel="bar"/>`));
@@ -48,14 +48,14 @@ test('anchorShouldWithRel: <a> with rel no errors', t => {
 });
 
 test('anchorShouldWithRel: <a> without rel return an error', t => {
-    const actual = rule.preDefined.anchorShouldWithRel.validate(
+    const actual = preDefinedRule.anchorShouldWithRel.validate(
         cheerio.load(
             `<a src="foo" />`));
     t.is(actual.length, 1);
 });
 
 test('anchorShouldWithRel: two <a> without rel return one error with count 2', t => {
-    const actual = rule.preDefined.anchorShouldWithRel.validate(
+    const actual = preDefinedRule.anchorShouldWithRel.validate(
         cheerio.load(
             `<a src="foo" />
             <a src="foo" />`));
@@ -63,14 +63,14 @@ test('anchorShouldWithRel: two <a> without rel return one error with count 2', t
 });
 
 test('head: no <head> no error', t => {
-    const actual = rule.preDefined.head.validate(
+    const actual = preDefinedRule.head.validate(
         cheerio.load(
             `<body></body>`))
     t.deepEqual(actual, [])
 });
 
 test('head: has <title>, <meta name="descriptions"/>, <meta name="keywords"/> no error', t => {
-    const actual = rule.preDefined.head.validate(
+    const actual = preDefinedRule.head.validate(
         cheerio.load(
             `<head>
             <title></title>
@@ -81,7 +81,7 @@ test('head: has <title>, <meta name="descriptions"/>, <meta name="keywords"/> no
 });
 
 test('head: without <title> have an error', t => {
-    const actual = rule.preDefined.head.validate(
+    const actual = preDefinedRule.head.validate(
         cheerio.load(
             `<head>
             <meta name="descriptions"/>
@@ -91,7 +91,7 @@ test('head: without <title> have an error', t => {
 });
 
 test('head: without <meta name="descriptions"/> have an error', t => {
-    const actual = rule.preDefined.head.validate(
+    const actual = preDefinedRule.head.validate(
         cheerio.load(
             `<head>
             <title></title>
@@ -101,7 +101,7 @@ test('head: without <meta name="descriptions"/> have an error', t => {
 });
 
 test('head: without <meta name="keywords"/> have an error', t => {
-    const actual = rule.preDefined.head.validate(
+    const actual = preDefinedRule.head.validate(
         cheerio.load(
             `<head>
             <title></title>
@@ -111,13 +111,13 @@ test('head: without <meta name="keywords"/> have an error', t => {
 });
 
 test('strongLimit(): should have function validate', t => {
-    const limitRule = rule.preDefined.strongLimit();
+    const limitRule = preDefinedRule.strongLimit();
     t.is(typeof limitRule.validate, 'function')
 });
 
 test('strongLimit(0): no <strong> no error ', t => {
     const limit = 0;
-    const actual = rule.preDefined.strongLimit(limit).validate(
+    const actual = preDefinedRule.strongLimit(limit).validate(
         cheerio.load(
             `<body>
             </body>`), limit)
@@ -126,7 +126,7 @@ test('strongLimit(0): no <strong> no error ', t => {
 
 test('strongLimit(0): 1 <strong> have error ', t => {
     const limit = 0;
-    const actual = rule.preDefined.strongLimit(limit).validate(
+    const actual = preDefinedRule.strongLimit(limit).validate(
         cheerio.load(
             `<body>
             <strong>1</strong>
@@ -136,7 +136,7 @@ test('strongLimit(0): 1 <strong> have error ', t => {
 
 test('strongLimit(15): 16 <strong> have error ', t => {
     const limit = 15;
-    const actual = rule.preDefined.strongLimit(limit).validate(
+    const actual = preDefinedRule.strongLimit(limit).validate(
         cheerio.load(
             `<body>
             <strong></strong><strong></strong><strong></strong><strong></strong><strong></strong>
@@ -148,7 +148,7 @@ test('strongLimit(15): 16 <strong> have error ', t => {
 });
 
 test('H1Limit1: no <h1> no error ', t => {
-    const actual = rule.preDefined.H1Limit1.validate(
+    const actual = preDefinedRule.H1Limit1.validate(
         cheerio.load(
             `<body>
             </body>`))
@@ -156,7 +156,7 @@ test('H1Limit1: no <h1> no error ', t => {
 });
 
 test('H1Limit1: one <h1> no error ', t => {
-    const actual = rule.preDefined.H1Limit1.validate(
+    const actual = preDefinedRule.H1Limit1.validate(
         cheerio.load(
             `<body>
             <h1></h1>
@@ -165,7 +165,7 @@ test('H1Limit1: one <h1> no error ', t => {
 });
 
 test('H1Limit1: two <h1> have error ', t => {
-    const actual = rule.preDefined.H1Limit1.validate(
+    const actual = preDefinedRule.H1Limit1.validate(
         cheerio.load(
             `<body>
             <h1></h1><h1></h1>
