@@ -124,3 +124,29 @@ test('strongLimit(15): 16 <strong> have error ', async t => {
             </body>`), limit)
     t.deepEqual(actual, [`There are more than ${limit} strong tag`])
 });
+
+test('H1Limit1: no <h1> no error ', async t => {
+    const actual = rule.preDefined.H1Limit1.validate(
+        cheerio.load(
+            `<body>
+            </body>`))
+    t.deepEqual(actual, [])
+});
+
+test('H1Limit1: one <h1> no error ', async t => {
+    const actual = rule.preDefined.H1Limit1.validate(
+        cheerio.load(
+            `<body>
+            <h1></h1>
+            </body>`))
+    t.deepEqual(actual, [])
+});
+
+test('H1Limit1: two <h1> have error ', async t => {
+    const actual = rule.preDefined.H1Limit1.validate(
+        cheerio.load(
+            `<body>
+            <h1></h1><h1></h1>
+            </body>`))
+    t.deepEqual(actual, [`There are more than 1 h1 tag`])
+});
