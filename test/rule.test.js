@@ -2,14 +2,14 @@ const cheerio = require('cheerio');
 const { test } = require('ava');
 const { rule } = require("../");
 
-test('imgShouldWithAlt: no img output no errors', async t => {
+test('imgShouldWithAlt: no img no errors', async t => {
     const actual = rule.preDefined.imgShouldWithAlt.validate(
         cheerio.load(
             `<h1></h1>`));
     t.deepEqual(actual, []);
 });
 
-test('imgShouldWithAlt: img with alt output no errors', async t => {
+test('imgShouldWithAlt: img with alt no errors', async t => {
     const actual = rule.preDefined.imgShouldWithAlt.validate(
         cheerio.load(
             `<img src="foo" alt="alt" />
@@ -17,14 +17,14 @@ test('imgShouldWithAlt: img with alt output no errors', async t => {
     t.deepEqual(actual, [])
 });
 
-test('imgShouldWithAlt: img without alt output one error', async t => {
+test('imgShouldWithAlt: img without alt return an error', async t => {
     const actual = rule.preDefined.imgShouldWithAlt.validate(
         cheerio.load(
             `<img src="foo" />`));
     t.is(actual.length, 1);
 });
 
-test('imgShouldWithAlt: two img without alt output one error with count 2', async t => {
+test('imgShouldWithAlt: two img without alt return one error with count 2', async t => {
     const actual = rule.preDefined.imgShouldWithAlt.validate(
         cheerio.load(
             `<img src="foo" />
@@ -32,12 +32,34 @@ test('imgShouldWithAlt: two img without alt output one error with count 2', asyn
     t.deepEqual(actual, [`There are 2 <img> tag without alt attribute`])
 });
 
-test('anchorShouldWithRel', async t => {
+test('anchorShouldWithRel: no a no errors', async t => {
     const actual = rule.preDefined.anchorShouldWithRel.validate(
         cheerio.load(
-            `<a rel="url"></a>
-            <a></a>`))
-    t.deepEqual(actual, [`There are 1 <a> tag without rel attribute`])
+            `<body></body>`));
+    t.deepEqual(actual, []);
+});
+
+test('anchorShouldWithRel: a with rel no errors', async t => {
+    const actual = rule.preDefined.anchorShouldWithRel.validate(
+        cheerio.load(
+            `<a src="foo" rel="rel" />
+            <a src="foo" rel="bar"/>`));
+    t.deepEqual(actual, [])
+});
+
+test('anchorShouldWithRel: a without rel return an error', async t => {
+    const actual = rule.preDefined.anchorShouldWithRel.validate(
+        cheerio.load(
+            `<a src="foo" />`));
+    t.is(actual.length, 1);
+});
+
+test('anchorShouldWithRel: two a without rel return one error with count 2', async t => {
+    const actual = rule.preDefined.anchorShouldWithRel.validate(
+        cheerio.load(
+            `<a src="foo" />
+            <a src="foo" />`));
+    t.deepEqual(actual, [`There are 2 <a> tag without rel attribute`])
 });
 
 test('head: no <head> no error', async t => {
