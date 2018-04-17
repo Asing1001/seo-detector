@@ -34,7 +34,7 @@ streamDetector.writeConsole().then(() => process.exit())
 It will out put following in console
 
 ```bash
-custom rule error: <foo> not exist!
+'This html does not contains <foo> tag!'
 ```
 
 ## Pre-defined SEO rules
