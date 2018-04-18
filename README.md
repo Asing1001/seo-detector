@@ -23,12 +23,12 @@ const fooExistRule = {
         return errors;
     }
 }
-const streamDetector = new Detector({
+const fileDetector = new Detector({
     input: path.resolve(__dirname, 'example.html'),
     rules: [ fooExistRule ]
 });
 
-streamDetector.writeConsole().then(() => process.exit())
+fileDetector.writeConsole().then(() => process.exit())
 ```
 
 It will out put following in console
