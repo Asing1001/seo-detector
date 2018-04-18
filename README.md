@@ -71,15 +71,15 @@ detector.writeConsole().then(() => process.exit())
 
 ### Constructor - `new Detector({input, rules ,logger?})`
 
-- input : string | stream
-- rules : Array<{validate: cheerioStatic => string[]}>
-- logger : console-like object
+- input : filePath-like `string` | `ReadableStream`
+- rules : `Array<{validate: cheerioStatic => string[]}>`
+- logger : console-like `object`
 
 ### `.writeConsole()` : `Promise<void>`
 
 Output result to console
 
-### `.getReadableStream()` : `Promise<stream>`
+### `.getReadableStream()` : `Promise<ReadableStream>`
 
 Return a readable stream
 
